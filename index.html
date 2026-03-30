@@ -1,0 +1,1703 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Bucket Member Front-End v2.6 Clean Rebuild</title>
+  <style>
+    :root{
+      --bg:#0f172a;
+      --panel:#111827;
+      --card:#1f2937;
+      --muted:#94a3b8;
+      --text:#e5e7eb;
+      --border:#334155;
+      --ok:#22c55e;
+      --warn:#f59e0b;
+      --bad:#ef4444;
+      --accent:#1d4ed8;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Arial,Helvetica,sans-serif;
+      background:linear-gradient(180deg,#0b1220,#111827);
+      color:var(--text);
+    }
+    .wrap{max-width:1480px;margin:0 auto;padding:18px}
+    h1,h2,h3{margin:.2rem 0 .7rem}
+    .sub{color:var(--muted);margin-bottom:18px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px}
+    .card{
+      background:rgba(31,41,55,.96);
+      border:1px solid var(--border);
+      border-radius:18px;
+      padding:16px;
+      box-shadow:0 8px 24px rgba(0,0,0,.25);
+    }
+    label{display:block;font-size:.92rem;margin:.45rem 0 .2rem;color:#cbd5e1}
+    input,textarea,button,select{
+      width:100%;
+      border-radius:12px;
+      border:1px solid var(--border);
+      background:#0b1220;
+      color:var(--text);
+      padding:10px 12px;
+      font-size:1rem;
+    }
+    textarea{min-height:100px;resize:vertical}
+    button{
+      cursor:pointer;
+      background:#172554;
+      border:1px solid var(--accent);
+      margin-top:10px;
+      font-weight:bold;
+    }
+    button:hover{filter:brightness(1.08)}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .row3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+    .row4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+    .row6{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+    .small{font-size:.9rem;color:var(--muted)}
+    .mono{font-family:Consolas,monospace;font-size:.95rem;white-space:pre-wrap;word-break:break-word}
+    .status{padding:10px 12px;border-radius:12px;margin-top:10px;font-weight:bold}
+    .ok{background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.55)}
+    .warn{background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.55)}
+    .bad{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.55)}
+    table{width:100%;border-collapse:collapse;margin-top:8px;font-size:.95rem}
+    th,td{border-bottom:1px solid var(--border);padding:8px 6px;text-align:left;vertical-align:top}
+    .pill{
+      display:inline-block;
+      padding:3px 8px;
+      border-radius:999px;
+      background:#082f49;
+      border:1px solid #0369a1;
+      margin-right:6px;
+      margin-bottom:6px;
+      font-size:.85rem;
+    }
+    .hint{
+      background:#0b1220;
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:10px 12px;
+      margin-top:8px;
+      font-size:.92rem;
+      color:#cbd5e1;
+    }
+    .footer{margin-top:18px;color:var(--muted);font-size:.9rem;text-align:center}
+    .actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+    .progressBar{height:16px;background:#0b1220;border:1px solid var(--border);border-radius:999px;overflow:hidden;margin-top:8px}
+    .progressFill{height:100%;width:0%;background:var(--accent);transition:width .08s linear}
+    .memberForm{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+      gap:10px;
+      margin-top:10px;
+    }
+    .formBlock{
+      background:#0b1220;
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:12px;
+    }
+    .wide{grid-column:1 / -1}
+    .recordBanner{
+      display:grid;
+      grid-template-columns:2fr 1fr 1fr 1fr;
+      gap:10px;
+      margin-top:10px;
+    }
+    .bannerCell{
+      background:#0b1220;
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:10px;
+    }
+    .tabBar{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      margin-top:10px;
+    }
+    .tabBtn.active{outline:2px solid #60a5fa}
+    .matchTableWrap{max-height:320px;overflow:auto}
+.extraFieldsGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-top:10px}
+.extraFieldCard{background:#0b1220;border:1px solid var(--border);border-radius:12px;padding:10px}
+.unifiedFormGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-top:10px}
+.unifiedFieldCard{background:#0b1220;border:1px solid var(--border);border-radius:12px;padding:10px}
+.sectionTitle{margin-top:12px;font-weight:bold;color:#cbd5e1}
+    @media (max-width: 980px){
+      .recordBanner,.row6,.row4,.row3,.row{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Bucket Member Front-End v2.6 Clean Rebuild</h1>
+  <div class="sub">Lightweight Access-style front end for member records, using your bucket system with fixed member fields, fast search, form editing, and Access-ready export.</div>
+
+  <div class="grid">
+    <div class="card">
+      <h2>Configuration</h2>
+      <div class="row3">
+        <div><label>Main buckets</label><input id="mainBuckets" type="number" value="80000" min="1"></div>
+        <div><label>Bucket size</label><input id="bucketSize" type="number" value="25" min="1"></div>
+        <div><label>Probe buckets</label><input id="probeBuckets" type="number" value="5" min="1"></div>
+      </div>
+      <div class="row3">
+        <div><label>Overflow buckets</label><input id="overflowBuckets" type="number" value="200" min="1"></div>
+        <div><label>Extra main buckets</label><input id="extraBuckets" type="number" value="10" min="0"></div>
+        <div><label>Expected records</label><input id="expectedRecords" type="number" value="700000" min="0"></div>
+      </div>
+      <button onclick="initDb()">Initialize / Reset Database</button>
+      <div id="initMsg"></div>
+    </div>
+
+    <div class="card">
+      <h2>Load Source File into Buckets</h2>
+      <label>Choose file</label>
+      <input id="loadFile" type="file" accept=".csv,.txt,.json,application/json,text/csv,text/plain">
+      <div class="row">
+        <div>
+          <label>File type</label>
+          <select id="fileType">
+            <option value="csv">CSV / text with columns</option>
+            <option value="json">JSON array of records</option>
+            <option value="ids">One numeric ID per line</option>
+          </select>
+        </div>
+        <div>
+          <label>User ID field name</label>
+          <input id="userIdField" type="text" value="user_id">
+        </div>
+      </div>
+      <label>CSV load is supported here. Fixed fields auto-map by similar names when possible</label>
+      <button onclick="loadFileIntoBuckets()">Load File and Populate Buckets</button>
+      <div id="fileMsg"></div>
+      <div id="fileSummary"></div>
+      <div id="loadProgressText" class="small"></div>
+      <div class="progressBar"><div id="loadProgressFill" class="progressFill"></div></div>
+    </div>
+
+    <div class="card">
+      <h2>Save / Load Bucket Database</h2>
+      <button onclick="exportJsonCompact()">Export Bucket Database JSON (compact)</button>
+      <button onclick="exportJsonSplit()">Export Split JSON Parts</button>
+      <button onclick="exportAccessCsv()">Export Access-Ready CSV</button>
+      <label>Import saved bucket JSON or split JSON parts</label>
+      <input id="importFile" type="file" accept=".json,application/json" multiple onchange="importJson(event)">
+      <div id="saveMsg"></div>
+      <div id="exportProgressText" class="small"></div>
+      <div class="progressBar"><div id="exportProgressFill" class="progressFill"></div></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h2>Member Search</h2>
+    <div class="row4">
+      <div>
+        <label>Find by User ID</label>
+        <input id="searchId" type="number" placeholder="e.g. 8123456">
+      </div>
+      <div>
+        <label>Find by last name</label>
+        <input id="searchLastName" type="text" placeholder="e.g. Smith">
+      </div>
+      <div>
+        <label>Find by name / squadron / any text</label>
+        <input id="searchText" type="text" placeholder="e.g. Hamilton">
+      </div>
+      <div>
+        <label>Max matches</label>
+        <input id="maxMatches" type="number" value="50" min="1">
+      </div>
+    </div>
+    <div class="actions">
+      <button onclick="findById()">Find by ID</button>
+      <button onclick="findByLastName()">Find by Last Name</button>
+      <button onclick="findByText()">Find by Text</button>
+      <button onclick="clearMemberForm()">New Member / Clear Form</button>
+    </div>
+    <div id="searchMsg"></div>
+    <div id="searchPath" class="mono"></div>
+    <div class="matchTableWrap"><div id="matchList"></div></div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h2>Member Form</h2>
+    <div class="recordBanner">
+      <div class="bannerCell"><div class="small">Current member</div><div id="bannerMemberName">None loaded</div></div>
+      <div class="bannerCell"><div class="small">Location</div><div id="recordLocation">none</div></div>
+      <div class="bannerCell"><div class="small">System</div><div id="bannerSystem">—</div></div>
+      <div class="bannerCell"><div class="small">Start bucket</div><div id="bannerStartBucket">—</div></div>
+      <div class="bannerCell"><div class="small">Fields loaded</div><div id="bannerFieldCount">—</div></div>
+    </div>
+
+    <div class="tabBar">
+      <button id="tabForm" class="tabBtn active" onclick="showFormView()">Clean Form View</button>
+      <button id="tabJson" class="tabBtn" onclick="showJsonView()">JSON View / Extra Fields</button>
+    </div>
+
+    <div id="formViewArea">
+      <div class="row">
+        <div>
+          <label>User ID</label>
+          <input id="f_user_id" type="number" placeholder="User ID">
+          <div class="small">Valid old: 0-999999. Valid new: 8000000-8999999.</div>
+        </div>
+        <div>
+          <label>Form display</label>
+          <select id="showAllFieldsToggle" onchange="rebuildUnifiedForm()">
+            <option value="all">Show all fields</option>
+            <option value="standard">Show standard fields only</option>
+          </select>
+        </div>
+      </div>
+      <div class="hint">Single unified form: standard member fields first in a fixed order, then any additional fields in the original input order where available.</div>
+      <div id="unifiedFormArea"></div>
+      <div class="actions" style="margin-top:10px">
+        <button onclick="addFromForm()">Add New Member</button>
+        <button onclick="saveFormChanges()">Save Changes</button>
+        <button onclick="deleteCurrent()">Delete Current Member</button>
+        <button onclick="syncFormToJson()">Sync Form to JSON</button>
+      </div>
+    </div>
+
+    <div id="jsonViewArea" style="display:none">
+      <div class="row">
+        <div>
+          <label>User ID</label>
+          <input id="editorUserId" type="number" placeholder="User ID">
+        </div>
+        <div>
+          <label>Known fixed fields are available in form view</label>
+          <div class="hint">Use JSON view for exact field inspection and extra/unmapped fields.</div>
+        </div>
+      </div>
+      <label>All other fields (JSON object)</label>
+      <textarea id="editorFields" placeholder='{"FirstName":"John","LastName":"Smith","Squadron":"Hamilton"}'></textarea>
+      <div class="actions">
+        <button onclick="syncJsonToForm()">Sync JSON to Form</button>
+        <button onclick="saveJsonChanges()">Save Changes from JSON</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid" style="margin-top:16px">
+    <div class="card">
+      <h2>Statistics</h2>
+      <div id="stats"></div>
+      <button onclick="refreshStats()">Refresh Stats</button>
+    </div>
+
+    <div class="card">
+      <h2>Bucket Inspector</h2>
+      <div class="row">
+        <div>
+          <label>Area</label>
+          <select id="inspectArea">
+            <option value="main">Main / extra</option>
+            <option value="overflow">Overflow</option>
+          </select>
+        </div>
+        <div>
+          <label>Bucket number</label>
+          <input id="inspectBucket" type="number" min="0" value="0">
+        </div>
+      </div>
+      <button onclick="inspectBucketView()">Show Bucket</button>
+      <div id="inspectMsg"></div>
+    </div>
+
+    <div class="card">
+      <h2>Bulk Quick Test</h2>
+      <label>How many random IDs to insert</label>
+      <input id="bulkCount" type="number" value="1000" min="1">
+      <button onclick="bulkInsert()">Insert Random IDs</button>
+      <div id="bulkMsg"></div>
+    </div>
+  </div>
+
+  <div class="footer">© 2026 Glen Carruthers. All rights reserved. Bucket Member Front-End v2.6 Clean Rebuild.1.2.1</div>
+</div>
+
+<script>
+let db = null;
+let currentRecordRef = null;
+
+const FIXED_FIELDS = [
+  'FirstName','LastName','MiddleName','Status','Squadron','District',
+  'Province','City','PostalCode','Phone','Email','Address1','Address2',
+  'MembershipType','MeritMarks','JoinDate','ExpiryDate','Notes'
+];
+
+const FIELD_ALIASES = {
+  FirstName: ['firstname','first_name','first name','givenname','given_name','given name'],
+  LastName: ['lastname','last_name','last name','surname','familyname','family_name','family name'],
+  MiddleName: ['middlename','middle_name','middle name','middleinitial','middle initial','initial'],
+  Status: ['status','memberstatus','member status'],
+  Squadron: ['squadron','sqdn','branch'],
+  District: ['district','dist'],
+  Province: ['province','prov','state'],
+  City: ['city','town'],
+  PostalCode: ['postalcode','postal code','postcode','zip','zipcode','zip code'],
+  Phone: ['phone','telephone','tel','homephone','cellphone','mobile'],
+  Email: ['email','e-mail','mail'],
+  Address1: ['address1','address 1','street','street1','line1','address'],
+  Address2: ['address2','address 2','street2','line2','suite','unit'],
+  MembershipType: ['membershiptype','membership type','membertype','member type','type'],
+  MeritMarks: ['meritmarks','merit marks','merit','marks'],
+  JoinDate: ['joindate','join date','member since','joined'],
+  ExpiryDate: ['expirydate','expiry date','renewaldate','renewal date','expires'],
+  Notes: ['notes','remarks','comment','comments']
+};
+
+function $(id){ return document.getElementById(id); }
+function escapeHtml(s){ return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'","&#39;"); }
+function setMsg(id, text, cls){ const el=$(id); el.innerHTML = text ? `<div class="status ${cls||'ok'}">${escapeHtml(text)}</div>` : ''; }
+
+function readConfig(){
+  const c = {
+    mainBuckets: parseInt($('mainBuckets').value,10),
+    bucketSize: parseInt($('bucketSize').value,10),
+    probeBuckets: parseInt($('probeBuckets').value,10),
+    overflowBuckets: parseInt($('overflowBuckets').value,10),
+    extraBuckets: parseInt($('extraBuckets').value,10),
+    expectedRecords: parseInt($('expectedRecords').value,10) || 0
+  };
+  if (Object.values(c).some(v => Number.isNaN(v) || v < 0)) throw new Error("Configuration values must be valid non-negative numbers.");
+  if (c.mainBuckets < 1 || c.bucketSize < 1 || c.probeBuckets < 1 || c.overflowBuckets < 1) throw new Error("Main buckets, bucket size, probe buckets, and overflow buckets must be at least 1.");
+  return c;
+}
+
+function createBuckets(count){ return Array.from({length:count}, () => []); }
+function requireDb(){ if (!db) throw new Error("Initialize the database first."); }
+
+function normalizeName(name){
+  return String(name || '').toLowerCase().replace(/[^a-z0-9]/g,'');
+}
+
+function findMappedValueFromObject(obj, fixedField){
+  const source = obj || {};
+  if (source[fixedField] !== undefined && source[fixedField] !== null && String(source[fixedField]) !== '') return source[fixedField];
+  const candidates = [fixedField].concat(FIELD_ALIASES[fixedField] || []).map(normalizeName);
+  for (const key of Object.keys(source)){
+    if (candidates.includes(normalizeName(key))){
+      return source[key];
+    }
+  }
+  return '';
+}
+
+function mergeDisplayFields(record){
+  const merged = {};
+  const raw = (record && record.rawFields) ? record.rawFields : {};
+  const mapped = (record && record.fields) ? record.fields : {};
+  Object.keys(raw).forEach(k => merged[k] = raw[k]);
+  Object.keys(mapped).forEach(k => merged[k] = mapped[k]);
+  return merged;
+}
+
+function getSystemInfo(userId){
+  if (!Number.isInteger(userId) || userId < 0) return { valid:false, systemType:'INVALID', baseId:null, message:'User ID must be a non-negative whole number.' };
+  if (userId >= 0 && userId <= 999999) return { valid:true, systemType:'OLD', baseId:userId, message:'' };
+  if (userId >= 8000000 && userId <= 8999999) return { valid:true, systemType:'NEW', baseId:userId - 8000000, message:'' };
+  return { valid:false, systemType:'INVALID', baseId:null, message:'User ID must be either 0-999999 (old system) or 8000000-8999999 (new system).' };
+}
+
+function setProgress(textId, fillId, current, total, label){
+  const textEl = $(textId), fillEl = $(fillId);
+  const safeTotal = total > 0 ? total : 1;
+  const pct = Math.max(0, Math.min(100, (current / safeTotal) * 100));
+  if (textEl) textEl.textContent = `${label}: ${current.toLocaleString()} / ${total.toLocaleString()} (${pct.toFixed(1)}%)`;
+  if (fillEl) fillEl.style.width = pct + '%';
+}
+
+function clearProgress(textId, fillId){
+  const textEl = $(textId), fillEl = $(fillId);
+  if (textEl) textEl.textContent = '';
+  if (fillEl) fillEl.style.width = '0%';
+}
+
+function nextFrame(){ return new Promise(resolve => setTimeout(resolve, 0)); }
+
+function initDb(){
+  try{
+    const c = readConfig();
+    db = { config:c, main:createBuckets(c.mainBuckets + c.extraBuckets), overflow:createBuckets(c.overflowBuckets), totalRecords:0, importMeta:null };
+    currentRecordRef = null;
+    clearMemberForm();
+    setMsg('initMsg', `Database initialized. ${c.mainBuckets.toLocaleString()} main buckets, ${c.extraBuckets} extra buckets, ${c.overflowBuckets} overflow buckets.`, 'ok');
+    refreshStats();
+  }catch(err){ setMsg('initMsg', err.message, 'bad'); }
+}
+
+function startBucketForId(userId){
+  const info = getSystemInfo(userId);
+  if (!info.valid) throw new Error(info.message);
+  return userId % db.config.mainBuckets;
+}
+
+function locateRecord(userId){
+  requireDb();
+  const start = startBucketForId(userId);
+  const path = [];
+  for (let i=0;i<db.config.probeBuckets;i++){
+    const b = start + i;
+    const bucket = db.main[b];
+    path.push(`Main bucket ${b}: ${bucket.length}/${db.config.bucketSize}`);
+    for (let j=0;j<bucket.length;j++){
+      if (bucket[j].userId === userId){
+        return { found:true, area:'main', bucketIndex:b, slotIndex:j, record:bucket[j], startBucket:start, path };
+      }
+    }
+  }
+  for (let i=0;i<db.overflow.length;i++){
+    const bucket = db.overflow[i];
+    path.push(`Overflow bucket ${i}: ${bucket.length}/${db.config.bucketSize}`);
+    for (let j=0;j<bucket.length;j++){
+      if (bucket[j].userId === userId){
+        return { found:true, area:'overflow', bucketIndex:i, slotIndex:j, record:bucket[j], startBucket:start, path };
+      }
+    }
+  }
+  return { found:false, startBucket:start, path };
+}
+
+function insertRecordObject(userId, fieldsObj, rawFieldsObj){
+  requireDb();
+  const sys = getSystemInfo(userId);
+  if (!sys.valid) return { ok:false, message:sys.message };
+  const existing = locateRecord(userId);
+  if (existing.found) return { ok:false, duplicate:true, message:`User ID ${userId} already exists.`, path:existing.path };
+  const start = startBucketForId(userId);
+  const path = [];
+  for (let i=0;i<db.config.probeBuckets;i++){
+    const b = start + i;
+    const bucket = db.main[b];
+    path.push(`Check main bucket ${b}: ${bucket.length}/${db.config.bucketSize}`);
+    if (bucket.length < db.config.bucketSize){
+      const rec = { userId, originalUserId:userId, systemType:sys.systemType, baseId:sys.baseId, fields: fieldsObj || {}, rawFields: rawFieldsObj || {}, insertedAt:new Date().toISOString(), updatedAt:new Date().toISOString(), area:'main', bucketIndex:b };
+      bucket.push(rec); db.totalRecords++;
+      return { ok:true, placed:'main', bucketIndex:b, path, record:rec };
+    }
+  }
+  for (let i=0;i<db.overflow.length;i++){
+    const bucket = db.overflow[i];
+    path.push(`Check overflow bucket ${i}: ${bucket.length}/${db.config.bucketSize}`);
+    if (bucket.length < db.config.bucketSize){
+      const rec = { userId, originalUserId:userId, systemType:sys.systemType, baseId:sys.baseId, fields: fieldsObj || {}, rawFields: rawFieldsObj || {}, insertedAt:new Date().toISOString(), updatedAt:new Date().toISOString(), area:'overflow', bucketIndex:i };
+      bucket.push(rec); db.totalRecords++;
+      return { ok:true, placed:'overflow', bucketIndex:i, path, record:rec };
+    }
+  }
+  return { ok:false, message:'All main probe buckets and all overflow buckets are full.', path };
+}
+
+function deleteByRef(ref){
+  const bucket = ref.area === 'main' ? db.main[ref.bucketIndex] : db.overflow[ref.bucketIndex];
+  bucket.splice(ref.slotIndex, 1);
+  db.totalRecords--;
+}
+
+function parseCsvLine(line){
+  const out=[]; let cur=''; let inQuotes=false;
+  for(let i=0;i<line.length;i++){
+    const ch=line[i];
+    if(ch === '"'){ if(inQuotes && line[i+1] === '"'){ cur += '"'; i++; } else { inQuotes = !inQuotes; } }
+    else if(ch === ',' && !inQuotes){ out.push(cur); cur=''; }
+    else { cur += ch; }
+  }
+  out.push(cur);
+  return out.map(v => v.trim());
+}
+
+function parseCsv(text){
+  const lines = text.split(/\r?\n/).filter(line => line.trim() !== '');
+  if (!lines.length) return [];
+  const headers = parseCsvLine(lines[0]);
+  const rows = [];
+  for(let i=1;i<lines.length;i++){
+    const cols = parseCsvLine(lines[i]); const row={};
+    headers.forEach((h, idx) => row[h] = cols[idx] ?? '');
+    rows.push(row);
+  }
+  return rows;
+}
+
+function toIntegerId(value){
+  const n = Number(value);
+  return Number.isInteger(n) && n >= 0 ? n : null;
+}
+
+function mapRecordToFixedFields(rawRow, userIdField){
+  const row = {...rawRow};
+  const mapped = {};
+  const usedOriginalKeys = new Set([userIdField]);
+
+  const originalKeys = Object.keys(row);
+  const normalizedKeyMap = {};
+  originalKeys.forEach(key => {
+    normalizedKeyMap[normalizeName(key)] = key;
+  });
+
+  for (const fixedField of FIXED_FIELDS){
+    const candidates = [fixedField].concat(FIELD_ALIASES[fixedField] || []).map(normalizeName);
+    let foundKey = null;
+
+    // direct exact key match first
+    if (fixedField in row) foundKey = fixedField;
+
+    // exact normalized match next
+    if (!foundKey){
+      for (const cand of candidates){
+        if (normalizedKeyMap[cand] !== undefined){
+          foundKey = normalizedKeyMap[cand];
+          break;
+        }
+      }
+    }
+
+    if (foundKey !== null && foundKey !== undefined){
+      mapped[fixedField] = row[foundKey];
+      usedOriginalKeys.add(foundKey);
+    }
+  }
+
+  const extras = {};
+  for (const key of originalKeys){
+    if (!usedOriginalKeys.has(key)){
+      extras[key] = row[key];
+    }
+  }
+
+  return { mapped, extras };
+}
+
+async function loadFileIntoBuckets(){
+  try{
+    requireDb();
+    clearProgress('loadProgressText', 'loadProgressFill');
+    const file = $('loadFile').files && $('loadFile').files[0];
+    if (!file) throw new Error("Choose a file first.");
+    const fileType = $('fileType').value;
+    const userIdField = $('userIdField').value.trim() || 'user_id';
+    const text = await file.text();
+
+    let sourceRows = [];
+    let originalFieldOrder = [];
+    if (fileType === 'csv'){
+      sourceRows = parseCsv(text);
+      const firstLine = text.split(/\r?\n/).find(line => line.trim() !== '');
+      originalFieldOrder = firstLine ? parseCsvLine(firstLine) : [];
+    } else if (fileType === 'json'){
+      const parsed = JSON.parse(text);
+      if (!Array.isArray(parsed)) throw new Error("JSON file must contain an array of records.");
+      sourceRows = parsed;
+      originalFieldOrder = parsed.length ? Object.keys(parsed[0]) : [];
+    } else if (fileType === 'ids'){
+      sourceRows = text.split(/\r?\n/).map(x=>x.trim()).filter(Boolean).map(x => ({ [userIdField]:x }));
+      originalFieldOrder = [userIdField];
+    } else {
+      throw new Error("Unsupported file type.");
+    }
+
+    if (!sourceRows.length) throw new Error("The file did not contain any records.");
+
+    let inserted=0, duplicates=0, invalid=0, overflow=0, failed=0;
+    const firstIssues=[], sampleBuckets=[];
+    const total = sourceRows.length;
+    const progressEvery = Math.max(1000, Math.floor(total / 200));
+
+    for(let i=0;i<sourceRows.length;i++){
+      const row = sourceRows[i];
+      const rawId = row[userIdField];
+      const userId = toIntegerId(rawId);
+
+      if (userId === null){
+        invalid++;
+        if (firstIssues.length < 10) firstIssues.push(`Row ${i+1}: invalid ${userIdField} = ${rawId}`);
+      } else {
+        const mapped = mapRecordToFixedFields(row, userIdField);
+        const fields = {...mapped.mapped, ...mapped.extras};
+        const rawFields = {...row}; delete rawFields[userIdField];
+        const result = insertRecordObject(userId, fields, rawFields);
+        if (result.ok){
+          inserted++;
+          if (sampleBuckets.length < 12) sampleBuckets.push(`${userId} → ${result.placed} ${result.bucketIndex}`);
+          if (result.placed === 'overflow') overflow++;
+        } else if (result.duplicate){
+          duplicates++;
+          if (firstIssues.length < 10) firstIssues.push(`Row ${i+1}: duplicate user ID ${userId}`);
+        } else {
+          failed++;
+          if (firstIssues.length < 10) firstIssues.push(`Row ${i+1}: ${result.message}`);
+        }
+      }
+
+      if ((i + 1) % progressEvery === 0 || i === sourceRows.length - 1){
+        setProgress('loadProgressText', 'loadProgressFill', i + 1, total, 'Loading file');
+        await nextFrame();
+      }
+    }
+
+    db.importMeta = {
+      fileName:file.name,
+      fileType,
+      userIdField,
+      originalFieldOrder,
+      sourceRows:sourceRows.length,
+      inserted, duplicates, invalid, overflow, failed,
+      loadedAt:new Date().toISOString()
+    };
+
+    setMsg('fileMsg', `Loaded ${file.name}. Inserted: ${inserted}, duplicates: ${duplicates}, invalid: ${invalid}, overflow: ${overflow}, failed: ${failed}.`, (failed || invalid) ? 'warn' : 'ok');
+
+    let summaryHtml = `
+      <div class="pill">File: ${escapeHtml(file.name)}</div>
+      <div class="pill">Rows read: ${sourceRows.length.toLocaleString()}</div>
+      <div class="pill">Inserted: ${inserted.toLocaleString()}</div>
+      <div class="pill">Duplicates: ${duplicates.toLocaleString()}</div>
+      <div class="pill">Invalid: ${invalid.toLocaleString()}</div>
+      <div class="pill">Overflow: ${overflow.toLocaleString()}</div>
+    `;
+    if (sampleBuckets.length) summaryHtml += `<div class="hint"><strong>Sample placements</strong><br>${escapeHtml(sampleBuckets.join(' | '))}</div>`;
+    if (firstIssues.length) summaryHtml += `<div class="hint"><strong>First issues</strong><br>${escapeHtml(firstIssues.join(' | '))}</div>`;
+    $('fileSummary').innerHTML = summaryHtml;
+    refreshStats();
+  }catch(err){
+    setMsg('fileMsg', err.message, 'bad');
+  }
+}
+
+function memberNameFromFields(fields){
+  const f = fields || {};
+  const full = [f.FirstName || '', f.MiddleName || '', f.LastName || ''].join(' ').replace(/\s+/g,' ').trim();
+  return full || f.LastName || f.FirstName || '(unnamed member)';
+}
+function getOrderedFormFields(fields){
+  const f = fields || {};
+  const keys = Object.keys(f);
+  const extras = keys.filter(k => !FIXED_FIELDS.includes(k));
+
+  let originalOrder = [];
+  if (db && db.importMeta && Array.isArray(db.importMeta.originalFieldOrder)){
+    originalOrder = db.importMeta.originalFieldOrder.slice();
+  }
+
+  const normalizedOriginalOrder = originalOrder.filter(k => k && !FIXED_FIELDS.includes(k));
+  const orderedExtras = [];
+
+  normalizedOriginalOrder.forEach(key => {
+    if (extras.includes(key) && !orderedExtras.includes(key)) orderedExtras.push(key);
+  });
+
+  extras.forEach(key => {
+    if (!orderedExtras.includes(key)) orderedExtras.push(key);
+  });
+
+  return FIXED_FIELDS.slice().concat(orderedExtras);
+}
+
+function rebuildUnifiedForm(fieldsObj){
+  const fields = fieldsObj || getCurrentFieldsFromJsonSafe();
+  const area = $('unifiedFormArea');
+  if (!area) return;
+  const showMode = $('showAllFieldsToggle') ? $('showAllFieldsToggle').value : 'all';
+  area.innerHTML = '';
+
+  const ordered = getOrderedFormFields(fields);
+  const standardKeys = FIXED_FIELDS.slice();
+  const extraKeys = ordered.filter(k => !FIXED_FIELDS.includes(k));
+
+  let html = '<div class="sectionTitle">Standard member fields</div><div class="unifiedFormGrid">';
+  standardKeys.forEach(key => {
+    const isNotes = key === 'Notes';
+    html += `<div class="unifiedFieldCard ${isNotes ? 'wide' : ''}">
+      <label>${escapeHtml(key)}</label>
+      ${isNotes
+        ? `<textarea data-unified-field="${escapeHtml(key)}">${escapeHtml(fields[key] ?? '')}</textarea>`
+        : `<input type="text" data-unified-field="${escapeHtml(key)}" value="${escapeHtml(fields[key] ?? '')}">`
+      }
+    </div>`;
+  });
+  html += '</div>';
+
+  if (showMode === 'all'){
+    html += '<div class="sectionTitle">Additional fields</div>';
+    if (!extraKeys.length){
+      html += '<div class="hint">No additional fields in this record.</div>';
+    } else {
+      html += '<div class="unifiedFormGrid">';
+      extraKeys.forEach(key => {
+        const val = fields[key] ?? '';
+        const longField = String(val).length > 80 || /note|comment|address/i.test(key);
+        html += `<div class="unifiedFieldCard ${longField ? 'wide' : ''}">
+          <label>${escapeHtml(key)}</label>
+          ${longField
+            ? `<textarea data-unified-field="${escapeHtml(key)}">${escapeHtml(val)}</textarea>`
+            : `<input type="text" data-unified-field="${escapeHtml(key)}" value="${escapeHtml(val)}">`
+          }
+        </div>`;
+      });
+      html += '</div>';
+    }
+  }
+
+  area.innerHTML = html;
+}
+
+function collectFieldsFromUnifiedForm(){
+  const fields = {};
+  const nodes = Array.from(document.querySelectorAll('#unifiedFormArea [data-unified-field]'));
+  nodes.forEach(node => {
+    const key = node.dataset.unifiedField;
+    const value = node.value;
+    if (String(value).trim() !== '') fields[key] = value;
+  });
+
+  if (($('showAllFieldsToggle') && $('showAllFieldsToggle').value === 'standard')){
+    let extraObj = {};
+    try{
+      extraObj = JSON.parse($('editorFields').value.trim() || '{}');
+      if (!extraObj || Array.isArray(extraObj) || typeof extraObj !== 'object') extraObj = {};
+    }catch(e){
+      extraObj = {};
+    }
+    Object.keys(extraObj).forEach(key => {
+      if (!FIXED_FIELDS.includes(key) && !(key in fields)) fields[key] = extraObj[key];
+    });
+  }
+  return fields;
+}
+
+function getCurrentFieldsFromJsonSafe(){
+  try{
+    const obj = JSON.parse($('editorFields').value.trim() || '{}');
+    if (!obj || Array.isArray(obj) || typeof obj !== 'object') return {};
+    return obj;
+  }catch(e){
+    return {};
+  }
+}
+
+function getExtraFields(fields){
+  const f = fields || {};
+  const extras = {};
+  Object.keys(f).forEach(key => {
+    if (!FIXED_FIELDS.includes(key)) extras[key] = f[key];
+  });
+  return extras;
+}
+
+function renderExtraFields(extraObj){
+  const area = $('extraFieldsArea');
+  if (!area) return;
+  area.innerHTML = '';
+  const keys = Object.keys(extraObj || {});
+  if (!keys.length){
+    area.innerHTML = '<div class="hint">No extra fields in this record.</div>';
+    return;
+  }
+  keys.forEach(key => {
+    const card = document.createElement('div');
+    card.className = 'extraFieldCard';
+    const label = document.createElement('label');
+    label.textContent = key;
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.value = extraObj[key] == null ? '' : String(extraObj[key]);
+    input.dataset.extraFieldName = key;
+    card.appendChild(label);
+    card.appendChild(input);
+    area.appendChild(card);
+  });
+}
+
+function collectExtraFieldsFromRenderedArea(){
+  const extras = {};
+  const nodes = Array.from(document.querySelectorAll('#extraFieldsArea input[data-extra-field-name]'));
+  nodes.forEach(node => {
+    extras[node.dataset.extraFieldName] = node.value;
+  });
+  return extras;
+}
+
+function populateFormFromRecord(ref){
+  currentRecordRef = ref;
+  const r = ref.record;
+  const displayFields = mergeDisplayFields(r);
+
+  const normalizedForForm = {...displayFields};
+  FIXED_FIELDS.forEach(name => {
+    const val = findMappedValueFromObject(displayFields, name);
+    if (val !== '' && val !== undefined && val !== null) normalizedForForm[name] = val;
+  });
+
+  if ($('f_user_id')) $('f_user_id').value = r.userId ?? '';
+  if ($('editorUserId')) $('editorUserId').value = r.userId ?? '';
+  if ($('editorFields')) $('editorFields').value = JSON.stringify(normalizedForForm || {}, null, 2);
+  rebuildUnifiedForm(normalizedForForm);
+
+  if ($('recordLocation')) $('recordLocation').textContent = `${ref.area} bucket ${ref.bucketIndex}, slot ${ref.slotIndex}`;
+  if ($('bannerMemberName')) $('bannerMemberName').textContent = memberNameFromFields(normalizedForForm);
+  if ($('bannerSystem')) $('bannerSystem').textContent = r.systemType || getSystemInfo(r.userId).systemType;
+  if ($('bannerStartBucket')) $('bannerStartBucket').textContent = startBucketForId(r.userId);
+  if ($('bannerFieldCount')) $('bannerFieldCount').textContent = Object.keys(normalizedForForm || {}).length;
+}
+
+
+function getCurrentFieldsFromJsonSafe(){
+  try{
+    const obj = JSON.parse(($('editorFields') && $('editorFields').value ? $('editorFields').value : '{}').trim() || '{}');
+    if (!obj || Array.isArray(obj) || typeof obj !== 'object') return {};
+    return obj;
+  }catch(e){
+    return {};
+  }
+}
+
+function getOrderedFormFields(fields){
+  const f = fields || {};
+  const keys = Object.keys(f);
+  const extras = keys.filter(k => !FIXED_FIELDS.includes(k));
+
+  let originalOrder = [];
+  if (db && db.importMeta && Array.isArray(db.importMeta.originalFieldOrder)){
+    originalOrder = db.importMeta.originalFieldOrder.slice();
+  }
+
+  const normalizedOriginalOrder = originalOrder.filter(k => k && !FIXED_FIELDS.includes(k));
+  const orderedExtras = [];
+
+  normalizedOriginalOrder.forEach(key => {
+    if (extras.includes(key) && !orderedExtras.includes(key)) orderedExtras.push(key);
+  });
+
+  extras.forEach(key => {
+    if (!orderedExtras.includes(key)) orderedExtras.push(key);
+  });
+
+  return FIXED_FIELDS.slice().concat(orderedExtras);
+}
+
+function rebuildUnifiedForm(fieldsObj){
+  const fields = fieldsObj || getCurrentFieldsFromJsonSafe();
+  const area = $('unifiedFormArea');
+  if (!area) return;
+  const showMode = $('showAllFieldsToggle') ? $('showAllFieldsToggle').value : 'all';
+  area.innerHTML = '';
+
+  const ordered = getOrderedFormFields(fields);
+  const standardKeys = FIXED_FIELDS.slice();
+  const extraKeys = ordered.filter(k => !FIXED_FIELDS.includes(k));
+
+  let html = '<div class="sectionTitle">Standard member fields</div><div class="unifiedFormGrid">';
+  standardKeys.forEach(key => {
+    const val = fields[key] ?? '';
+    const isNotes = key === 'Notes';
+    html += `<div class="unifiedFieldCard ${isNotes ? 'wide' : ''}">
+      <label>${escapeHtml(key)}</label>
+      ${isNotes
+        ? `<textarea data-unified-field="${escapeHtml(key)}">${escapeHtml(val)}</textarea>`
+        : `<input type="text" data-unified-field="${escapeHtml(key)}" value="${escapeHtml(val)}">`
+      }
+    </div>`;
+  });
+  html += '</div>';
+
+  if (showMode === 'all'){
+    html += '<div class="sectionTitle">Additional fields</div>';
+    if (!extraKeys.length){
+      html += '<div class="hint">No additional fields in this record.</div>';
+    } else {
+      html += '<div class="unifiedFormGrid">';
+      extraKeys.forEach(key => {
+        const val = fields[key] ?? '';
+        const longField = String(val).length > 80 || /note|comment|address/i.test(key);
+        html += `<div class="unifiedFieldCard ${longField ? 'wide' : ''}">
+          <label>${escapeHtml(key)}</label>
+          ${longField
+            ? `<textarea data-unified-field="${escapeHtml(key)}">${escapeHtml(val)}</textarea>`
+            : `<input type="text" data-unified-field="${escapeHtml(key)}" value="${escapeHtml(val)}">`
+          }
+        </div>`;
+      });
+      html += '</div>';
+    }
+  }
+  area.innerHTML = html;
+}
+
+function collectFieldsFromUnifiedForm(){
+  const fields = {};
+  const nodes = Array.from(document.querySelectorAll('#unifiedFormArea [data-unified-field]'));
+  nodes.forEach(node => {
+    const key = node.dataset.unifiedField;
+    const value = node.value;
+    if (String(value).trim() !== '') fields[key] = value;
+  });
+
+  if (($('showAllFieldsToggle') && $('showAllFieldsToggle').value === 'standard')){
+    let extraObj = {};
+    try{
+      extraObj = JSON.parse(($('editorFields') && $('editorFields').value ? $('editorFields').value : '{}').trim() || '{}');
+      if (!extraObj || Array.isArray(extraObj) || typeof extraObj !== 'object') extraObj = {};
+    }catch(e){
+      extraObj = {};
+    }
+    Object.keys(extraObj).forEach(key => {
+      if (!FIXED_FIELDS.includes(key) && !(key in fields)) fields[key] = extraObj[key];
+    });
+  }
+  return fields;
+}
+
+function clearMemberForm(){
+  currentRecordRef = null;
+  if ($('f_user_id')) $('f_user_id').value = '';
+  if ($('editorUserId')) $('editorUserId').value = '';
+  if ($('editorFields')) $('editorFields').value = '{}';
+  rebuildUnifiedForm({});
+  if ($('recordLocation')) $('recordLocation').textContent = 'new unsaved record';
+  if ($('bannerMemberName')) $('bannerMemberName').textContent = 'None loaded';
+  if ($('bannerSystem')) $('bannerSystem').textContent = '—';
+  if ($('bannerStartBucket')) $('bannerStartBucket').textContent = '—';
+  if ($('bannerFieldCount')) $('bannerFieldCount').textContent = '—';
+  if ($('searchPath')) $('searchPath').textContent = '';
+  if ($('matchList')) $('matchList').innerHTML = '';
+  setMsg('searchMsg', '', '');
+  showFormView();
+}
+
+function collectFieldsFromForm(){
+  return collectFieldsFromUnifiedForm();
+}
+
+function syncFormToJson(){
+  try{
+    const fields = collectFieldsFromForm();
+    $('editorUserId').value = $('f_user_id').value;
+    $('editorFields').value = JSON.stringify(fields, null, 2);
+    $('bannerMemberName').textContent = memberNameFromFields(fields);
+    setMsg('searchMsg', 'Unified form changes synced to JSON.', 'ok');
+  }catch(err){
+    setMsg('searchMsg', err.message, 'bad');
+  }
+}
+
+function syncJsonToForm(){
+  try{
+    const obj = JSON.parse(($('editorFields') && $('editorFields').value ? $('editorFields').value : '{}').trim() || '{}');
+    if (!obj || Array.isArray(obj) || typeof obj !== 'object') throw new Error("JSON fields must be an object.");
+    if ($('f_user_id') && $('editorUserId')) $('f_user_id').value = $('editorUserId').value;
+    rebuildUnifiedForm(obj);
+    if ($('bannerMemberName')) $('bannerMemberName').textContent = memberNameFromFields(obj);
+    setMsg('searchMsg', 'JSON synced to unified form.', 'ok');
+    showFormView();
+  }catch(err){
+    setMsg('searchMsg', err.message, 'bad');
+  }
+}
+
+function showFormView(){
+  if ($('formViewArea')) $('formViewArea').style.display = '';
+  if ($('jsonViewArea')) $('jsonViewArea').style.display = 'none';
+  if ($('tabForm')) $('tabForm').classList.add('active');
+  if ($('tabJson')) $('tabJson').classList.remove('active');
+}
+
+function showJsonView(){
+  if ($('formViewArea')) $('formViewArea').style.display = 'none';
+  if ($('jsonViewArea')) $('jsonViewArea').style.display = '';
+  if ($('tabJson')) $('tabJson').classList.add('active');
+  if ($('tabForm')) $('tabForm').classList.remove('active');
+}
+
+function flattenRecordText(record){
+  const parts = [String(record.userId)];
+  const fields = record.fields || {};
+  Object.entries(fields).forEach(([k,v]) => parts.push(`${k} ${v}`));
+  return parts.join(' ').toLowerCase();
+}
+
+function scanAllRecords(callback){
+  for (let i=0;i<db.main.length;i++){
+    const bucket = db.main[i];
+    for (let j=0;j<bucket.length;j++) callback({ area:'main', bucketIndex:i, slotIndex:j, record:bucket[j] });
+  }
+  for (let i=0;i<db.overflow.length;i++){
+    const bucket = db.overflow[i];
+    for (let j=0;j<bucket.length;j++) callback({ area:'overflow', bucketIndex:i, slotIndex:j, record:bucket[j] });
+  }
+}
+
+function renderRecordTable(matches){
+  if (!matches.length) return '<div class="hint">No matches found.</div>';
+  let html = '<table><tr><th>Open</th><th>User ID</th><th>Name</th><th>Squadron</th><th>District</th><th>Location</th></tr>';
+  matches.forEach(m => {
+    const f = m.record.fields || {};
+    html += `<tr>
+      <td><button onclick="selectMatch('${m.area}',${m.bucketIndex},${m.slotIndex})">Open</button></td>
+      <td>${escapeHtml(m.record.userId)}</td>
+      <td>${escapeHtml(memberNameFromFields(f))}</td>
+      <td>${escapeHtml(f.Squadron || '')}</td>
+      <td>${escapeHtml(f.District || '')}</td>
+      <td>${escapeHtml(m.area)} ${m.bucketIndex}</td>
+    </tr>`;
+  });
+  html += '</table>';
+  return html;
+}
+
+function selectMatch(area, bucketIndex, slotIndex){
+  try{
+    requireDb();
+    const bucket = area === 'main' ? db.main[bucketIndex] : db.overflow[bucketIndex];
+    const record = bucket[slotIndex];
+    if (!record) throw new Error("Record no longer exists.");
+    populateFormFromRecord({ area, bucketIndex, slotIndex, record });
+    showFormView();
+    setMsg('searchMsg', `Opened user ID ${record.userId} in the member form.`, area === 'overflow' ? 'warn' : 'ok');
+  }catch(err){ setMsg('searchMsg', err.message, 'bad'); }
+}
+
+function findById(){
+  try{
+    requireDb();
+    const id = parseInt($('searchId').value, 10);
+    const info = getSystemInfo(id);
+    if (!info.valid) throw new Error(info.message);
+    const result = locateRecord(id);
+    $('searchPath').textContent = result.path.join('\n');
+    if (!result.found){
+      currentRecordRef = null;
+      setMsg('searchMsg', `User ID ${id} not found. Starting bucket ${result.startBucket}.`, 'bad');
+      $('matchList').innerHTML = '';
+      return;
+    }
+    populateFormFromRecord(result);
+    $('matchList').innerHTML = renderRecordTable([result]);
+    showFormView();
+    setMsg('searchMsg', `Found user ID ${id}.`, result.area === 'overflow' ? 'warn' : 'ok');
+  }catch(err){ setMsg('searchMsg', err.message, 'bad'); }
+}
+
+function findByLastName(){
+  try{
+    requireDb();
+    const q = $('searchLastName').value.trim().toLowerCase();
+    const maxMatches = Math.max(1, parseInt($('maxMatches').value, 10) || 50);
+    if (!q) throw new Error("Enter a last name to search.");
+    const matches = [];
+    scanAllRecords(ref => {
+      if (matches.length >= maxMatches) return;
+      const last = String((ref.record.fields || {}).LastName || '').toLowerCase();
+      if (last.includes(q)) matches.push(ref);
+    });
+    $('matchList').innerHTML = renderRecordTable(matches);
+    if (matches.length){
+      populateFormFromRecord(matches[0]);
+      showFormView();
+      setMsg('searchMsg', `Found ${matches.length} match(es) by last name.`, 'ok');
+    } else {
+      setMsg('searchMsg', 'No matching last names found.', 'bad');
+    }
+    $('searchPath').textContent = '';
+  }catch(err){ setMsg('searchMsg', err.message, 'bad'); }
+}
+
+function findByText(){
+  try{
+    requireDb();
+    const q = $('searchText').value.trim().toLowerCase();
+    const maxMatches = Math.max(1, parseInt($('maxMatches').value, 10) || 50);
+    if (!q) throw new Error("Enter text to search.");
+    const matches = [];
+    scanAllRecords(ref => {
+      if (matches.length >= maxMatches) return;
+      if (flattenRecordText(ref.record).includes(q)) matches.push(ref);
+    });
+    $('matchList').innerHTML = renderRecordTable(matches);
+    if (matches.length){
+      populateFormFromRecord(matches[0]);
+      showFormView();
+      setMsg('searchMsg', `Found ${matches.length} match(es).`, 'ok');
+    } else {
+      setMsg('searchMsg', 'No matching records found.', 'bad');
+    }
+    $('searchPath').textContent = '';
+  }catch(err){ setMsg('searchMsg', err.message, 'bad'); }
+}
+
+function addFromForm(){
+  try{
+    requireDb();
+    syncFormToJson();
+    const id = parseInt($('f_user_id').value, 10);
+    const info = getSystemInfo(id);
+    if (!info.valid) throw new Error(info.message);
+    const fields = collectFieldsFromForm();
+    const result = insertRecordObject(id, fields, fields);
+    if (!result.ok){
+      setMsg('searchMsg', result.message, result.duplicate ? 'warn' : 'bad');
+      if (result.path) $('searchPath').textContent = result.path.join('\n');
+      return;
+    }
+    const slot = result.placed === 'main' ? db.main[result.bucketIndex].length - 1 : db.overflow[result.bucketIndex].length - 1;
+    populateFormFromRecord({ area:result.placed, bucketIndex:result.bucketIndex, slotIndex:slot, record:result.record });
+    $('searchPath').textContent = result.path.join('\n');
+    setMsg('searchMsg', `Added new member ${id}.`, result.placed === 'overflow' ? 'warn' : 'ok');
+    refreshStats();
+  }catch(err){ setMsg('searchMsg', err.message, 'bad'); }
+}
+
+function saveCurrentWithFields(newId, fields){
+  if (!currentRecordRef) throw new Error("Open a member first.");
+  const oldId = currentRecordRef.record.userId;
+
+  if (newId === oldId){
+    const bucket = currentRecordRef.area === 'main' ? db.main[currentRecordRef.bucketIndex] : db.overflow[currentRecordRef.bucketIndex];
+    bucket[currentRecordRef.slotIndex].fields = fields;
+    bucket[currentRecordRef.slotIndex].updatedAt = new Date().toISOString();
+    populateFormFromRecord({ ...currentRecordRef, record: bucket[currentRecordRef.slotIndex] });
+    setMsg('searchMsg', `Saved changes to user ID ${newId}.`, 'ok');
+    refreshStats();
+    return;
+  }
+
+  const existing = locateRecord(newId);
+  if (existing.found) throw new Error(`Cannot change ID to ${newId} because that ID already exists.`);
+
+  const oldRef = { ...currentRecordRef };
+  deleteByRef(oldRef);
+  const result = insertRecordObject(newId, fields);
+  if (!result.ok){
+    insertRecordObject(oldId, oldRef.record.fields || {});
+    throw new Error(`Could not move record to new ID ${newId}. Original record restored.`);
+  }
+  const newSlot = result.placed === 'main' ? db.main[result.bucketIndex].length - 1 : db.overflow[result.bucketIndex].length - 1;
+  populateFormFromRecord({ area:result.placed, bucketIndex:result.bucketIndex, slotIndex:newSlot, record:result.record });
+  $('searchPath').textContent = result.path.join('\n');
+  setMsg('searchMsg', `Saved changes. Record moved from ID ${oldId} to ID ${newId}.`, result.placed === 'overflow' ? 'warn' : 'ok');
+  refreshStats();
+}
+
+function saveFormChanges(){
+  try{
+    requireDb();
+    if (!currentRecordRef) throw new Error("Open a member first.");
+    syncFormToJson();
+    const newId = parseInt($('f_user_id').value, 10);
+    const info = getSystemInfo(newId);
+    if (!info.valid) throw new Error(info.message);
+    const fields = collectFieldsFromForm();
+    saveCurrentWithFields(newId, fields);
+  }catch(err){ setMsg('searchMsg', err.message, 'bad'); }
+}
+
+function saveJsonChanges(){
+  try{
+    requireDb();
+    if (!currentRecordRef) throw new Error("Open a member first.");
+    const newId = parseInt($('editorUserId').value, 10);
+    const info = getSystemInfo(newId);
+    if (!info.valid) throw new Error(info.message);
+    const fields = JSON.parse($('editorFields').value.trim() || '{}');
+    if (!fields || Array.isArray(fields) || typeof fields !== 'object') throw new Error("JSON fields must be an object.");
+    saveCurrentWithFields(newId, fields);
+    syncJsonToForm();
+  }catch(err){ setMsg('searchMsg', err.message, 'bad'); }
+}
+
+function deleteCurrent(){
+  try{
+    requireDb();
+    if (!currentRecordRef) throw new Error("Open a member first.");
+    const id = currentRecordRef.record.userId;
+    deleteByRef(currentRecordRef);
+    clearMemberForm();
+    setMsg('searchMsg', `Deleted user ID ${id}.`, 'ok');
+    refreshStats();
+  }catch(err){ setMsg('searchMsg', err.message, 'bad'); }
+}
+
+function getStats(){
+  requireDb();
+  const c = db.config;
+  let mainUsedBuckets=0, overflowUsedBuckets=0, mainRecords=0, overflowRecords=0, maxMainFill=0, maxOverflowFill=0;
+  for(let i=0;i<db.main.length;i++){
+    const len=db.main[i].length; if(len) mainUsedBuckets++; if(i<c.mainBuckets) mainRecords+=len; maxMainFill=Math.max(maxMainFill,len);
+  }
+  for(let i=0;i<db.overflow.length;i++){
+    const len=db.overflow[i].length; if(len) overflowUsedBuckets++; overflowRecords+=len; maxOverflowFill=Math.max(maxOverflowFill,len);
+  }
+  const mainCapacityNominal=c.mainBuckets*c.bucketSize;
+  const mainCapacityWithExtra=(c.mainBuckets+c.extraBuckets)*c.bucketSize;
+  const overflowCapacity=c.overflowBuckets*c.bucketSize;
+  const totalCapacity=mainCapacityWithExtra+overflowCapacity;
+  return { mainUsedBuckets, overflowUsedBuckets, mainRecords, overflowRecords, maxMainFill, maxOverflowFill, mainCapacityNominal, mainCapacityWithExtra, overflowCapacity, totalCapacity };
+}
+
+function refreshStats(){
+  try{
+    requireDb();
+    const c=db.config, s=getStats();
+    const avgPerMainBucket=(s.mainRecords/c.mainBuckets).toFixed(2);
+    const nominalLoad=((s.mainRecords/s.mainCapacityNominal)*100).toFixed(2);
+    const totalLoad=((db.totalRecords/s.totalCapacity)*100).toFixed(2);
+    let importInfo='';
+    if(db.importMeta){
+      importInfo = `<tr><td>Last imported file</td><td>${escapeHtml(db.importMeta.fileName)}</td></tr>
+      <tr><td>Last imported rows</td><td>${db.importMeta.sourceRows.toLocaleString()}</td></tr>
+      <tr><td>Last inserted from file</td><td>${db.importMeta.inserted.toLocaleString()}</td></tr>`;
+    }
+    $('stats').innerHTML = `
+      <div class="pill">Total records: ${db.totalRecords.toLocaleString()}</div>
+      <div class="pill">Main records: ${s.mainRecords.toLocaleString()}</div>
+      <div class="pill">Overflow records: ${s.overflowRecords.toLocaleString()}</div>
+      <div class="pill">Average per main bucket: ${avgPerMainBucket}</div>
+      <div class="pill">Main load: ${nominalLoad}%</div>
+      <div class="pill">Total load: ${totalLoad}%</div>
+      <table>
+        <tr><th>Measure</th><th>Value</th></tr>
+        <tr><td>Main bucket count</td><td>${c.mainBuckets.toLocaleString()}</td></tr>
+        <tr><td>Main bucket count incl. extra</td><td>${(c.mainBuckets+c.extraBuckets).toLocaleString()}</td></tr>
+        <tr><td>Bucket size</td><td>${c.bucketSize}</td></tr>
+        <tr><td>Probe buckets</td><td>${c.probeBuckets}</td></tr>
+        <tr><td>Main nominal capacity</td><td>${s.mainCapacityNominal.toLocaleString()}</td></tr>
+        <tr><td>Main capacity incl. extra</td><td>${s.mainCapacityWithExtra.toLocaleString()}</td></tr>
+        <tr><td>Overflow capacity</td><td>${s.overflowCapacity.toLocaleString()}</td></tr>
+        <tr><td>Total capacity</td><td>${s.totalCapacity.toLocaleString()}</td></tr>
+        <tr><td>Main buckets in use</td><td>${s.mainUsedBuckets.toLocaleString()}</td></tr>
+        <tr><td>Overflow buckets in use</td><td>${s.overflowUsedBuckets.toLocaleString()}</td></tr>
+        <tr><td>Max main bucket fill</td><td>${s.maxMainFill}</td></tr>
+        <tr><td>Max overflow bucket fill</td><td>${s.maxOverflowFill}</td></tr>
+        ${importInfo}
+      </table>`;
+  }catch(err){ $('stats').innerHTML = `<div class="status bad">${escapeHtml(err.message)}</div>`; }
+}
+
+function inspectBucketView(){
+  try{
+    requireDb();
+    const area = $('inspectArea').value;
+    const idx = parseInt($('inspectBucket').value,10);
+    if (!Number.isInteger(idx) || idx < 0) throw new Error("Bucket number must be a non-negative whole number.");
+    let bucket, title;
+    if(area === 'main'){
+      if(idx >= db.main.length) throw new Error(`Main bucket must be between 0 and ${db.main.length-1}.`);
+      bucket = db.main[idx]; title = `Main bucket ${idx}`;
+    } else {
+      if(idx >= db.overflow.length) throw new Error(`Overflow bucket must be between 0 and ${db.overflow.length-1}.`);
+      bucket = db.overflow[idx]; title = `Overflow bucket ${idx}`;
+    }
+    let html = `<div class="hint"><strong>${title}</strong> — ${bucket.length}/${db.config.bucketSize} records</div>`;
+    if(!bucket.length) html += `<div class="hint">Bucket is empty.</div>`;
+    else {
+      html += `<table><tr><th>#</th><th>User ID</th><th>Name</th><th>System</th><th>Squadron</th></tr>`;
+      bucket.forEach((r,i)=>{ html += `<tr><td>${i}</td><td>${escapeHtml(r.userId)}</td><td>${escapeHtml(memberNameFromFields(r.fields))}</td><td>${escapeHtml(r.systemType || getSystemInfo(r.userId).systemType)}</td><td>${escapeHtml((r.fields||{}).Squadron || '')}</td></tr>`; });
+      html += `</table>`;
+    }
+    $('inspectMsg').innerHTML = html;
+  }catch(err){ setMsg('inspectMsg', err.message, 'bad'); }
+}
+
+function bulkInsert(){
+  try{
+    requireDb();
+    const count = parseInt($('bulkCount').value,10);
+    if(!Number.isInteger(count) || count < 1) throw new Error("Bulk count must be at least 1.");
+    let ok=0, dup=0, fail=0, overflow=0;
+    for(let i=0;i<count;i++){
+      const id = Math.floor(Math.random()*900000000) + 1;
+      const res = insertRecordObject(id, {});
+      if(res.ok){ ok++; if(res.placed==='overflow') overflow++; }
+      else if(res.duplicate) dup++;
+      else fail++;
+    }
+    setMsg('bulkMsg', `Bulk insert complete. Inserted: ${ok}, duplicates: ${dup}, failed: ${fail}, overflow: ${overflow}.`, fail ? 'warn' : 'ok');
+    refreshStats();
+  }catch(err){ setMsg('bulkMsg', err.message, 'bad'); }
+}
+
+function buildExportObject(){
+  return {
+    config: db.config,
+    totalRecords: db.totalRecords,
+    importMeta: db.importMeta || {},
+    main: db.main,
+    overflow: db.overflow
+  };
+}
+
+function downloadTextFile(filename, text, mimeType){
+  const blob = new Blob([text], {type: mimeType || 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+
+function buildExportObject(){
+  return {
+    config: db.config,
+    totalRecords: db.totalRecords,
+    importMeta: db.importMeta || {},
+    main: db.main,
+    overflow: db.overflow
+  };
+}
+
+function downloadTextFile(filename, text, mimeType){
+  const blob = new Blob([text], {type: mimeType || 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function exportJsonCompact(){
+  try{
+    requireDb();
+    clearProgress('exportProgressText', 'exportProgressFill');
+    setProgress('exportProgressText', 'exportProgressFill', 0, 1, 'Building compact JSON');
+    const jsonText = JSON.stringify(buildExportObject());
+    setProgress('exportProgressText', 'exportProgressFill', 1, 1, 'Building compact JSON');
+    downloadTextFile('bucket_member_frontend_v2_export.json', jsonText, 'application/json');
+    setMsg('saveMsg', 'Compact JSON exported. For very large databases, use Split JSON Parts.', 'ok');
+  }catch(err){
+    setMsg('saveMsg', 'Compact JSON export failed. Use Split JSON Parts or CSV export.', 'bad');
+  }
+}
+
+function csvEscape(value){
+  if (value === null || value === undefined) return '';
+  const s = String(value);
+  if (/[",\n\r]/.test(s)) return '"' + s.replaceAll('"', '""') + '"';
+  return s;
+}
+
+function exportAccessCsv(){
+  try{
+    requireDb();
+    clearProgress('exportProgressText', 'exportProgressFill');
+    const idFieldName = $('userIdField').value.trim() || 'user_id';
+
+    let originalFieldOrder = [];
+    if (db.importMeta && Array.isArray(db.importMeta.originalFieldOrder) && db.importMeta.originalFieldOrder.length){
+      originalFieldOrder = db.importMeta.originalFieldOrder.filter(name => name !== idFieldName);
+    } else {
+      originalFieldOrder = FIXED_FIELDS.slice();
+    }
+
+    let refs = [];
+    scanAllRecords(ref => refs.push(ref));
+    const total = refs.length;
+    const progressEvery = Math.max(1000, Math.floor((total || 1) / 200));
+
+    const seen = new Set([idFieldName]);
+    const orderedFields = [];
+    originalFieldOrder.forEach(name => {
+      if (!seen.has(name)){ orderedFields.push(name); seen.add(name); }
+    });
+    FIXED_FIELDS.forEach(name => {
+      if (!seen.has(name)){ orderedFields.push(name); seen.add(name); }
+    });
+
+    refs.forEach(ref => {
+      Object.keys(ref.record.fields || {}).forEach(name => {
+        if (!seen.has(name)){
+          orderedFields.push(name);
+          seen.add(name);
+        }
+      });
+    });
+
+    const bucketFields = ['SystemType','BaseID','StartBucket','BucketArea','ActualBucket','SlotInBucket','IsOverflow','InsertedAt','UpdatedAt'];
+    const headers = [idFieldName].concat(orderedFields).concat(bucketFields);
+    const lines = [headers.map(csvEscape).join(',')];
+
+    for (let i = 0; i < refs.length; i++){
+      const ref = refs[i];
+      const r = ref.record;
+      const sys = r.systemType ? {systemType:r.systemType, baseId:r.baseId} : getSystemInfo(r.userId);
+      const row = [];
+      row.push(r.userId);
+      orderedFields.forEach(name => row.push((r.fields || {})[name] ?? ''));
+      row.push(sys.systemType);
+      row.push(sys.baseId);
+      row.push(r.userId % db.config.mainBuckets);
+      row.push(ref.area);
+      row.push(ref.bucketIndex);
+      row.push(ref.slotIndex);
+      row.push(ref.area === 'overflow' ? 1 : 0);
+      row.push(r.insertedAt || '');
+      row.push(r.updatedAt || '');
+      lines.push(row.map(csvEscape).join(','));
+
+      if ((i + 1) % progressEvery === 0 || i === refs.length - 1){
+        setProgress('exportProgressText', 'exportProgressFill', i + 1, total, 'Building CSV');
+      }
+    }
+
+    downloadTextFile('bucket_member_frontend_v2_access.csv', lines.join('\r\n'), 'text/csv;charset=utf-8;');
+    setMsg('saveMsg', 'Access-ready CSV exported.', 'ok');
+  }catch(err){
+    setMsg('saveMsg', err.message, 'bad');
+  }
+}
+
+
+function exportJsonSplit(){
+  try{
+    requireDb();
+    clearProgress('exportProgressText', 'exportProgressFill');
+
+    const bucketRefs = [];
+    for (let i = 0; i < db.main.length; i++){
+      if (db.main[i].length) bucketRefs.push({area:'main', index:i});
+    }
+    for (let i = 0; i < db.overflow.length; i++){
+      if (db.overflow[i].length) bucketRefs.push({area:'overflow', index:i});
+    }
+
+    const total = Math.max(1, bucketRefs.length);
+    const maxBucketsPerPart = 1500;
+    const parts = [];
+    for (let i = 0; i < bucketRefs.length; i += maxBucketsPerPart){
+      parts.push(bucketRefs.slice(i, i + maxBucketsPerPart));
+    }
+    if (!parts.length) parts.push([]);
+
+    const manifest = {
+      format: 'bucket-member-frontend-split-json',
+      version: 'v2.6-clean-rebuild',
+      createdAt: new Date().toISOString(),
+      config: db.config,
+      totalRecords: db.totalRecords,
+      importMeta: db.importMeta || {},
+      partCount: parts.length,
+      filenames: []
+    };
+
+    let processed = 0;
+    for (let p = 0; p < parts.length; p++){
+      const main = Array.from({length: db.main.length}, () => []);
+      const overflow = Array.from({length: db.overflow.length}, () => []);
+
+      parts[p].forEach(ref => {
+        if (ref.area === 'main') main[ref.index] = db.main[ref.index];
+        else overflow[ref.index] = db.overflow[ref.index];
+        processed++;
+      });
+
+      const payload = {
+        format: 'bucket-member-frontend-split-json-part',
+        version: 'v2.6-clean-rebuild',
+        partNumber: p + 1,
+        partCount: parts.length,
+        config: db.config,
+        totalRecords: db.totalRecords,
+        importMeta: db.importMeta || {},
+        main,
+        overflow
+      };
+
+      const filename = `bucket_member_frontend_v2_part_${String(p+1).padStart(3,'0')}_of_${String(parts.length).padStart(3,'0')}.json`;
+      manifest.filenames.push(filename);
+      downloadTextFile(filename, JSON.stringify(payload), 'application/json');
+      setProgress('exportProgressText', 'exportProgressFill', processed, total, 'Building split JSON');
+    }
+
+    downloadTextFile('bucket_member_frontend_v2_manifest.json', JSON.stringify(manifest, null, 2), 'application/json');
+    setMsg('saveMsg', `Split JSON exported in ${parts.length} part(s) plus a manifest. To restore, select all part files together.`, 'ok');
+  }catch(err){
+    setMsg('saveMsg', 'Split JSON export failed.', 'bad');
+  }
+}
+
+async function exportAccessCsv(){
+  try{
+    requireDb();
+    clearProgress('exportProgressText', 'exportProgressFill');
+
+    const refs = [];
+    scanAllRecords(ref => refs.push(ref));
+    const total = refs.length;
+
+    if (!total){
+      setMsg('saveMsg', 'There are no records to export.', 'warn');
+      return;
+    }
+
+    setMsg('saveMsg', `Starting Access-ready CSV export for ${total.toLocaleString()} records...`, 'ok');
+    setProgress('exportProgressText','exportProgressFill',0,total,'Building CSV');
+
+    const idFieldName = (($('userIdField') && $('userIdField').value.trim()) || 'user_id');
+
+    let originalFieldOrder = [];
+    if (db.importMeta && Array.isArray(db.importMeta.originalFieldOrder) && db.importMeta.originalFieldOrder.length){
+      originalFieldOrder = db.importMeta.originalFieldOrder.slice();
+    }
+
+    const seen = new Set();
+    const orderedFields = [];
+
+    originalFieldOrder.forEach(name => {
+      if (name !== idFieldName && !seen.has(name)){
+        orderedFields.push(name);
+        seen.add(name);
+      }
+    });
+
+    refs.forEach(ref => {
+      const mergedNames = new Set([
+        ...Object.keys(ref.record.rawFields || {}),
+        ...Object.keys(ref.record.fields || {})
+      ]);
+      mergedNames.forEach(name => {
+        if (name !== idFieldName && !seen.has(name)){
+          orderedFields.push(name);
+          seen.add(name);
+        }
+      });
+    });
+
+    const bucketFields = [
+      'SystemType',
+      'BaseID',
+      'StartBucket',
+      'BucketArea',
+      'ActualBucket',
+      'SlotInBucket',
+      'IsOverflow',
+      'InsertedAt',
+      'UpdatedAt'
+    ];
+
+    const headers = [idFieldName].concat(orderedFields).concat(bucketFields);
+    const lines = [headers.map(csvEscape).join(',')];
+
+    const progressEvery = Math.max(250, Math.floor(total / 200));
+
+    for (let i = 0; i < refs.length; i++){
+      const ref = refs[i];
+      const r = ref.record;
+      const sys = r.systemType ? { systemType: r.systemType, baseId: r.baseId } : getSystemInfo(r.userId);
+
+      const merged = {};
+      Object.keys(r.rawFields || {}).forEach(k => { merged[k] = r.rawFields[k]; });
+      Object.keys(r.fields || {}).forEach(k => { merged[k] = r.fields[k]; });
+
+      const row = [];
+      row.push(r.userId);
+      orderedFields.forEach(name => row.push(merged[name] ?? ''));
+
+      row.push(sys.systemType);
+      row.push(sys.baseId);
+      row.push(r.userId % db.config.mainBuckets);
+      row.push(ref.area);
+      row.push(ref.bucketIndex);
+      row.push(ref.slotIndex);
+      row.push(ref.area === 'overflow' ? 1 : 0);
+      row.push(r.insertedAt || '');
+      row.push(r.updatedAt || '');
+
+      lines.push(row.map(csvEscape).join(','));
+
+      if ((i + 1) % progressEvery === 0 || i === refs.length - 1){
+        setProgress('exportProgressText','exportProgressFill',i + 1,total,'Building CSV');
+        setMsg('saveMsg', `Building Access-ready CSV... ${(i + 1).toLocaleString()} / ${total.toLocaleString()}`, 'ok');
+        await nextFrame();
+      }
+    }
+
+    downloadTextFile('bucket_member_frontend_access_ready.csv', lines.join('\r\n'), 'text/csv;charset=utf-8;');
+    setProgress('exportProgressText','exportProgressFill',total,total,'Building CSV');
+    setMsg('saveMsg', 'Access-ready CSV export complete: bucket_member_frontend_access_ready.csv', 'ok');
+  }catch(err){
+    setMsg('saveMsg', 'CSV export failed: ' + (err.message || err), 'bad');
+  }
+}
+
+function importJson(event){
+  const files = event.target.files ? Array.from(event.target.files) : [];
+  if (!files.length) return;
+
+  Promise.all(files.map(file => file.text().then(text => ({name:file.name, text})))).then(items => {
+    try{
+      if (items.length === 1){
+        const obj = JSON.parse(items[0].text);
+        if (!obj || !obj.config || !Array.isArray(obj.main) || !Array.isArray(obj.overflow)) throw new Error("Invalid bucket database JSON.");
+        db = obj;
+      } else {
+        const parsed = items.map(item => ({name:item.name, obj:JSON.parse(item.text)}));
+        const partObjs = parsed.map(x => x.obj).filter(obj => obj && obj.format === 'bucket-member-frontend-split-json-part');
+        if (!partObjs.length) throw new Error("No valid split JSON parts were found.");
+
+        partObjs.sort((a,b) => (a.partNumber || 0) - (b.partNumber || 0));
+        const first = partObjs[0];
+
+        db = {
+          config: first.config,
+          totalRecords: first.totalRecords || 0,
+          importMeta: first.importMeta || {},
+          main: Array.from({length:first.main.length}, () => []),
+          overflow: Array.from({length:first.overflow.length}, () => [])
+        };
+
+        partObjs.forEach(part => {
+          for (let i = 0; i < part.main.length; i++){
+            if (part.main[i] && part.main[i].length) db.main[i] = part.main[i];
+          }
+          for (let i = 0; i < part.overflow.length; i++){
+            if (part.overflow[i] && part.overflow[i].length) db.overflow[i] = part.overflow[i];
+          }
+        });
+      }
+
+      if (!db.importMeta) db.importMeta = {};
+      if (!Array.isArray(db.importMeta.originalFieldOrder)) db.importMeta.originalFieldOrder = [];
+
+      const normalizeBucket = (bucketArr) => {
+        bucketArr.forEach(rec => {
+          if (!('fields' in rec)) rec.fields = {};
+          if (!('rawFields' in rec)) rec.rawFields = rec.fields || {};
+          const sys = getSystemInfo(rec.userId);
+          rec.originalUserId = rec.userId;
+          rec.systemType = sys.valid ? sys.systemType : (rec.systemType || 'INVALID');
+          rec.baseId = sys.valid ? sys.baseId : (rec.baseId ?? null);
+          rec.insertedAt = rec.insertedAt || '';
+          rec.updatedAt = rec.updatedAt || rec.insertedAt || '';
+        });
+      };
+      db.main.forEach(normalizeBucket);
+      db.overflow.forEach(normalizeBucket);
+
+      $('mainBuckets').value = db.config.mainBuckets;
+      $('bucketSize').value = db.config.bucketSize;
+      $('probeBuckets').value = db.config.probeBuckets;
+      $('overflowBuckets').value = db.config.overflowBuckets;
+      $('extraBuckets').value = db.config.extraBuckets;
+      $('expectedRecords').value = db.config.expectedRecords || 0;
+      clearMemberForm();
+      setMsg('saveMsg', items.length === 1 ? 'Bucket database imported successfully.' : 'Split JSON parts imported successfully.', 'ok');
+      refreshStats();
+    }catch(err){
+      setMsg('saveMsg', err.message, 'bad');
+    }
+  }).catch(err => setMsg('saveMsg', err.message, 'bad'));
+}
+initDb();
+</script>
+</body>
+</html>
